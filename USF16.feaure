@@ -1,0 +1,29 @@
+Feature: Decisión de Aceptar/Rechazar unidades en recepción
+  Como recepción/laboratorio,
+  deseo aceptar o rechazar unidades según su historial de temperatura,
+  para asegurar la calidad.
+
+  Scenario: Decisión asistida por el sistema
+    Dado que las reglas de aceptación están definidas (ej. "máx. 5 min fuera de rango")
+    Y el usuario de recepción escanea la "Unidad-123"
+    Y la "Unidad-123" tuvo una excursión de 10 minutos
+    Cuando el sistema analiza el historial
+    Entonces la app sugiere "No Apta"
+    Y muestra la razón: "Excursión de 10 minutos (límite 5 min)".
+
+  Scenario: Anulación (Override) de la sugerencia del sistema con justificación
+    Dado que el sistema ha sugerido "No Apta" para la "Unidad-123"
+    Y el usuario actual tiene rol de "Responsable de Laboratorio"
+    Cuando el responsable decide aceptar la unidad
+    Y presiona "Aceptar Manualmente"
+    Entonces el sistema solicita una justificación obligatoria
+    Y al ingresarla, la unidad se marca como "Apta (con anulación)"
+    Y se registra al autor de la anulación.
+
+  Scenario: Acción de rechazo en lote
+    Dado que el "Contenedor-A" llega con 20 unidades
+    Y el historial del contenedor muestra una falla crítica
+    Cuando el usuario de recepción selecciona las 20 unidades
+    Y presiona "Rechazar Lote"
+    Entonces puedo aplicar la misma decisión (Rechazar) a todas las unidades seleccionadas
+    Y todas las unidades se marcan como "Rechazadas".
